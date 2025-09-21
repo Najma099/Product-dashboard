@@ -11,7 +11,6 @@ import {
   List,
   SortAsc,
   SortDesc,
-  Filter
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -64,7 +63,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
           <Package className="h-16 w-16 text-muted-foreground/50 mb-4" />
           <h3 className="text-lg font-semibold text-muted-foreground mb-2">No products found</h3>
           <p className="text-sm text-muted-foreground text-center max-w-md">
-            Try adjusting your search criteria or filters to find what you're looking for.
+            Try adjusting your search criteria or filters to find what you&apos;re looking for.
           </p>
         </CardContent>
       </Card>

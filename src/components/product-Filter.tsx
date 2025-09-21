@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import { Filter } from "lucide-react"
 
 interface ProductFiltersProps {
@@ -79,7 +78,7 @@ export const ProductFilters = ({
               <SelectItem key={cert.value} value={cert.value} className="cursor-pointer">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${cert.color}`} />
-                  {cert.value}
+                  {cert.value.replace(/"/g, '&quot;').replace(/'/g, '&apos;')}
                 </div>
               </SelectItem>
             ))}

@@ -1,16 +1,6 @@
 import React from 'react';
-
-interface FormData {
-  name: string;
-  category: string;
-  image: string;
-  ingredients: string[];
-  origin: string;
-  supplier: string;
-  certification: "Gold" | "Platinum" | "Silver" | "Green" | "None";
-  certificationBody: string;
-  expiryDate: string;
-}
+import { FormData } from './productFormWizard';
+import Image from 'next/image';
 
 interface Step1BasicInfoProps {
   formData: FormData;
@@ -18,108 +8,77 @@ interface Step1BasicInfoProps {
   errors: { [key: string]: string };
 }
 
-export const Step1BasicInfo: React.FC<Step1BasicInfoProps> = ({ formData, setFormData, errors }) => {
-  const categories = [
-    'Beverages',
-    'Food & Snacks', 
-    'Health & Wellness',
-    'Personal Care',
-    'Household',
-    'Baby & Kids',
-    'Pet Care',
-    'Supplements'
-  ];
+const categoryOptions = [
+  "Beverages",
+  "Food & Snacks",
+  "Health & Wellness",
+  "Personal Care",
+  "Household",
+  "Baby & Kids",
+  "Pet Care",
+  "Supplements",
+  "Fruits",
+  "Vegetables",
+  "Meat",
+  "Seafood",
+  "Dairy"
+];
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev: FormData) => ({ ...prev, [field]: value }));
+export const Step1BasicInfo: React.FC<Step1BasicInfoProps> = ({ formData, setFormData, errors }) => {
+  const handleInputChange = (field: keyof FormData, value: string) => {
+    setFormData({ ...formData, [field]: value });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0] || null;
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
-        return;
-      }
-
-      if (!file.type.startsWith('image/')) {
-        alert('Please select a valid image file');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setFormData((prev: FormData) => ({ ...prev, image: e.target?.result as string }));
-        }
-      };
-      reader.readAsDataURL(file);
+      setFormData({ ...formData, image: file });
     }
   };
 
   const removeImage = () => {
-    setFormData((prev: FormData) => ({ ...prev, image: '' }));
+    setFormData({ ...formData, image: null });
+  };
+
+  const getImagePreviewSrc = () => {
+    if (!formData.image) return '';
+    return typeof formData.image === 'string'
+      ? formData.image
+      : URL.createObjectURL(formData.image);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">Basic Product Information</h3>
-        <p className="text-gray-600">Let's start with the essential details about your product</p>
-      </div>
+    <div className="flex flex-col gap-6">
 
       {/* Product Name */}
-      <div className="space-y-2">
-        <label className="block text-sm font-semibold text-gray-700">
-          Product Name <span className="text-red-500">*</span>
-        </label>
-        <input 
-          type="text" 
-          value={formData.name} 
+      <div>
+        <label className="block font-medium mb-1">Product Name</label>
+        <input
+          type="text"
+          value={formData.name}
           onChange={(e) => handleInputChange('name', e.target.value)}
-          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-            errors.name ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
-          }`}
-          placeholder="Enter your product name"
+          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         />
-        {errors.name && (
-          <div className="flex items-center gap-2 text-red-600 text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {errors.name}
-          </div>
-        )}
+        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
       </div>
 
-      {/* Category */}
-      <div className="space-y-2">
-        <label className="block text-sm font-semibold text-gray-700">
-          Product Category <span className="text-red-500">*</span>
-        </label>
-        <select 
-          value={formData.category} 
+      {/* Category Dropdown */}
+      <div>
+        <label className="block font-medium mb-1">Category</label>
+        <select
+          value={formData.category}
           onChange={(e) => handleInputChange('category', e.target.value)}
-          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-            errors.category ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
-          }`}
+          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="">Select a category</option>
-          {categories.map(category => (
-            <option key={category} value={category}>{category}</option>
+          {categoryOptions.map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
-        {errors.category && (
-          <div className="flex items-center gap-2 text-red-600 text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {errors.category}
-          </div>
-        )}
+        {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
       </div>
 
-      {/* Product Image */}
+      {/* Product Image Upload */}
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-gray-700">
           Product Image <span className="text-red-500">*</span>
@@ -131,10 +90,10 @@ export const Step1BasicInfo: React.FC<Step1BasicInfoProps> = ({ formData, setFor
             <div className="p-6">
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative group">
-                  <img 
-                    src={formData.image} 
+                  <Image
+                    src={getImagePreviewSrc()} 
                     alt="Product preview" 
-                    className="w-48 h-48 object-cover rounded-xl shadow-lg border-4 border-white"
+                    className="w-48 h-48 object-contain bg-gray-100 rounded-xl shadow-lg border-4 border-white"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-xl flex items-center justify-center">
                     <button
@@ -189,14 +148,7 @@ export const Step1BasicInfo: React.FC<Step1BasicInfoProps> = ({ formData, setFor
             </div>
           )}
         </div>
-        {errors.image && (
-          <div className="flex items-center gap-2 text-red-600 text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {errors.image}
-          </div>
-        )}
+        {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
       </div>
     </div>
   );

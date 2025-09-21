@@ -81,7 +81,7 @@ export const FilterBar = ({
           
           {search && (
             <Badge variant="outline" className="gap-1 pr-1">
-              <span className="truncate max-w-[100px]">"{search}"</span>
+              <span className="truncate max-w-[100px]">{search}</span>
               <Button
                 variant="ghost"
                 size="icon"

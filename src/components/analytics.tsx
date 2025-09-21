@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Product } from '@/data/product';
 import { ExtendedProduct } from '@/lib/type';
+import Image from "next/image";
 
 // Union type that accepts both Product and ExtendedProduct
 interface AnalyticsModalProps {
@@ -64,12 +65,6 @@ const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ product, isVisible, onC
   };
 
   const analytics = generateAnalytics(product);
-
-  const getScoreClass = (score: number) => {
-    if (score >= 80) return 'text-green-600 dark:text-green-400';
-    if (score >= 60) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
-  };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "#10b981"; // green
@@ -245,7 +240,7 @@ const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ product, isVisible, onC
                   {/* Product Image */}
                   {extendedProduct.image && (
                     <div className="text-center">
-                      <img
+                      <Image
                         src={extendedProduct.image}
                         alt={extendedProduct.name}
                         className="w-32 h-32 object-cover rounded-lg mx-auto shadow-md border-2 border-card"

@@ -8,20 +8,34 @@ import { Step3Certifications } from './step3Certifications';
 import { Step4Review } from './step4.review';
 import { ExtendedProduct } from '@/lib/type';
 
+type CertificationType = "Gold" | "Platinum" | "Silver" | "Green" | "None";
+
+export interface FormData {
+  name: string;
+  category: string;
+  image: File | null;
+  ingredients: string[];
+  origin: string;
+  supplier: string;
+  certification: CertificationType;
+  certificationBody: string;
+  expiryDate: string;
+}
+
 export const ProductFormWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     category: '',
-    image: '',
+    image: null,
     ingredients: [''],
     origin: '',
     supplier: '',
-    certification: 'None' as "Gold" | "Platinum" | "Silver" | "Green" | "None",
+    certification: 'None',
     certificationBody: '',
     expiryDate: ''
   });
@@ -56,7 +70,7 @@ export const ProductFormWizard = () => {
       setFormData({
         name: '',
         category: '',
-        image: '',
+        image: null,
         ingredients: [''],
         origin: '',
         supplier: '',
@@ -87,14 +101,11 @@ export const ProductFormWizard = () => {
           <p className="text-muted-foreground">Complete the form to submit your product for transparency analysis</p>
         </div>
 
-        {/* Step Navigation */}
         <StepNavigation steps={steps} currentStep={currentStep} />
 
-        {/* Form Content */}
         <div className="bg-gradient-to-r from-card/40 to-card/20 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl p-8">
           {renderStepContent()}
 
-          {/* Navigation Buttons - Theme-aware */}
           <div className="flex justify-between items-center mt-8 pt-6 border-t border-border/30">
             <button 
               disabled={currentStep === 1} 
@@ -155,17 +166,17 @@ export const ProductFormWizard = () => {
 };
 
 // Helper for preview
-const generatePreviewProduct = (formData: any): ExtendedProduct => ({
+const generatePreviewProduct = (formData: FormData): ExtendedProduct => ({
   id: Math.floor(Math.random() * 1000),
   name: formData.name || 'Product Name',
   category: formData.category || 'Category',
-  certification: formData.certification as "None" | "Gold" | "Platinum" | "Silver" | "Green",
+  certification: formData.certification,
   transparencyScore: 80,
   riskFlags: 1,
   status: 'Pending',
   updatedDate: new Date().toISOString().split('T')[0],
-  image: formData.image,
-  ingredients: formData.ingredients.filter((i:string) => i.trim()),
+  image: formData.image ? URL.createObjectURL(formData.image) : '',
+  ingredients: formData.ingredients.filter((i) => i.trim()),
   origin: formData.origin,
   supplier: formData.supplier,
   certificationBody: formData.certificationBody,
