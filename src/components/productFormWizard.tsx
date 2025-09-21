@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { validateStep } from '@/lib/schema';
+import { validateStep } from '@/lib/validation';
 import AnalyticsModal from './analytics';
 import { StepNavigation } from './stepNavigation';
 import { Step1BasicInfo } from './step1BasicInfo';
@@ -78,42 +78,44 @@ export const ProductFormWizard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 text-black">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 dark:from-background dark:via-background dark:to-primary/5 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Product</h1>
-          <p className="text-gray-600">Complete the form to submit your product for transparency analysis</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
+            Add New Product
+          </h1>
+          <p className="text-muted-foreground">Complete the form to submit your product for transparency analysis</p>
         </div>
 
         {/* Step Navigation */}
         <StepNavigation steps={steps} currentStep={currentStep} />
 
         {/* Form Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-gradient-to-r from-card/40 to-card/20 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl p-8">
           {renderStepContent()}
 
-          {/* Navigation Buttons - CORRECTED */}
-          <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+          {/* Navigation Buttons - Theme-aware */}
+          <div className="flex justify-between items-center mt-8 pt-6 border-t border-border/30">
             <button 
               disabled={currentStep === 1} 
               onClick={handlePrevious}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
                 currentStep === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-600 text-white hover:bg-gray-700'
+                  ? 'bg-muted/50 text-muted-foreground cursor-not-allowed'
+                  : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground shadow-lg'
               }`}
             >
               ← Previous
             </button>
 
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               Step {currentStep} of {steps.length}
             </div>
 
             {currentStep < 4 ? (
               <button 
                 onClick={handleNext} 
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="px-6 py-3 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground rounded-lg font-medium shadow-lg shadow-primary/25 transition-all duration-300"
               >
                 Next →
               </button>
@@ -121,13 +123,22 @@ export const ProductFormWizard = () => {
               <button 
                 onClick={handleSubmit} 
                 disabled={isSubmitted}
-                className={`px-8 py-3 rounded-lg font-medium transition-all ${
+                className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 ${
                   isSubmitted
                     ? 'bg-green-600 text-white cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+                    : 'bg-gradient-to-r from-primary via-primary to-purple-600 hover:from-primary/90 hover:via-primary/90 hover:to-purple-700 text-primary-foreground shadow-lg shadow-primary/25'
                 }`}
               >
-                {isSubmitted ? 'Processing...' : 'Submit Product'}
+                {isSubmitted ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  'Submit Product'
+                )}
               </button>
             )}
           </div>
