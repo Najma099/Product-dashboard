@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Transparency Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        .radial-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .radial-progress svg {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+        
+        .progress-ring-bg {
+            stroke: #e5e7eb;
+        }
+        
+        .progress-ring-fill {
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 2s ease-in-out;
+        }
+        
+        .score-good { stroke: #10b981; }
+        .score-moderate { stroke: #f59e0b; }
+        .score-poor { stroke: #ef4444; }
+        
+        .flag-high { @apply bg-red-100 text-red-800 border-red-200; }
+        .flag-medium { @apply bg-yellow-100 text-yellow-800 border-yellow-200; }
+        .flag-low { @apply bg-green-100 text-green-800 border-green-200; }
+        
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <!-- Trigger Button -->
+    <button 
+        onclick="openModal()" 
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-colors duration-200 flex items-center gap-2"
+    >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        View Product Transparency
+    </button>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden modal-backdrop">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-slideIn">
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold">Product Transparency Report</h2>
+                            <p class="text-blue-100 mt-1" id="productName">Organic Herbal Tea</p>
+                        </div>
+                        <button 
+                            onclick="closeModal()" 
+                            class="text-white hover:text-gray-200 transition-colors"
+                        >
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="p-6">
+                    <!-- Score Section -->
+                    <div class="text-center mb-8 animate-fadeInUp">
+                        <div class="flex justify-center mb-4">
+                            <div class="radial-progress">
+                                <svg class="w-full h-full" viewBox="0 0 120 120">
+                                    <circle class="progress-ring progress-ring-bg" cx="60" cy="60" r="50"></circle>
+                                    <circle id="progressRing" class="progress-ring progress-ring-fill score-moderate" cx="60" cy="60" r="50"></circle>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <div class="text-3xl font-bold text-gray-800" id="scoreValue">72</div>
+                                        <div class="text-sm text-gray-500">Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto">
+                            <p class="text-yellow-800" id="explanation">Moderate transparency. Missing sourcing details for 2 ingredients.</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Content Grid -->
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        <!-- Suggestions Panel -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm animate-fadeInUp" style="animation-delay: 0.2s">
+                            <div class="flex items-center gap-2 mb-4">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                                <h3 class="text-lg font-semibold text-gray-800">Improvement Suggestions</h3>
+                            </div>
+                            <div class="space-y-3" id="suggestionsList">
+                                <!-- Suggestions will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Flags Panel -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm animate-fadeInUp" style="animation-delay: 0.4s">
+                            <div class="flex items-center gap-2 mb-4">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.767 0L3.047 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <h3 class="text-lg font-semibold text-gray-800">Risk Flags</h3>
+                            </div>
+                            <div class="space-y-3" id="flagsList">
+                                <!-- Flags will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detail Panel -->
+                    <div id="detailPanel" class="hidden mt-6 bg-gradient-to-br from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-6 animate-fadeInUp">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Detailed Analysis</h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <!-- Mini Progress Chart -->
+                            <div class="text-center">
+                                <div class="flex justify-center mb-2">
+                                    <div class="radial-progress" style="width: 80px; height: 80px;">
+                                        <svg class="w-full h-full" viewBox="0 0 80 80">
+                                            <circle class="progress-ring progress-ring-bg" cx="40" cy="40" r="30" stroke-width="6"></circle>
+                                            <circle id="detailProgressRing" class="progress-ring progress-ring-fill score-moderate" cx="40" cy="40" r="30" stroke-width="6"></circle>
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div class="text-xl font-bold text-gray-800" id="detailScore">72</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600">Transparency Score</p>
+                            </div>
+
+                            <!-- AI Explanation -->
+                            <div class="md:col-span-2">
+                                <h4 class="font-semibold text-gray-800 mb-2">AI Analysis</h4>
+                                <p class="text-gray-700 text-sm" id="detailExplanation">
+                                    Our AI analysis indicates moderate transparency levels. The product meets basic disclosure requirements but lacks comprehensive sourcing information for key ingredients, which impacts overall transparency scoring.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Top Suggestions in Detail Panel -->
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">Priority Actions</h4>
+                            <div class="grid md:grid-cols-2 gap-3" id="detailSuggestions">
+                                <!-- Detail suggestions will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
+                        <button 
+                            onclick="toggleDetailPanel()" 
+                            id="detailToggle"
+                            class="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
+                        >
+                            <span>Show Details</span>
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <div class="flex gap-3">
+                            <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                                Export Report
+                            </button>
+                            <button onclick="closeModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const productData = {
+            "productName": "Organic Herbal Tea",
+            "score": 72,
+            "explanation": "Moderate transparency. Missing sourcing details for 2 ingredients.",
+            "suggestions": [
+                "Add sourcing details for green tea leaves.",
+                "Include certification ID for 'organic' claim.",
+                "Clarify packaging recyclability."
+            ],
+            "flags": ["Incomplete sourcing", "Unverified organic claim"]
+        };
+
+        // Suggestion icons mapping
+        const suggestionIcons = {
+            "sourcing": "🌱",
+            "certification": "🏆",
+            "packaging": "📦",
+            "default": "💡"
+        };
+
+        // Flag severity mapping
+        const flagSeverity = {
+            "Incomplete sourcing": "medium",
+            "Unverified organic claim": "medium",
+            "Missing ingredients": "high",
+            "No certification": "high",
+            "Unclear labeling": "low"
+        };
+
+        function getIconForSuggestion(suggestion) {
+            const text = suggestion.toLowerCase();
+            if (text.includes('sourcing') || text.includes('source')) return '🌱';
+            if (text.includes('certification') || text.includes('certified')) return '🏆';
+            if (text.includes('packaging') || text.includes('package')) return '📦';
+            if (text.includes('label') || text.includes('labeling')) return '🏷️';
+            return '💡';
+        }
+
+        function getSeverityClass(flag) {
+            const severity = flagSeverity[flag] || 'low';
+            return `flag-${severity}`;
+        }
+
+        function getScoreClass(score) {
+            if (score >= 80) return 'score-good';
+            if (score >= 60) return 'score-moderate';
+            return 'score-poor';
+        }
+
+        function populateModal() {
+            // Set product name and basic info
+            document.getElementById('productName').textContent = productData.productName;
+            document.getElementById('scoreValue').textContent = productData.score;
+            document.getElementById('explanation').textContent = productData.explanation;
+            document.getElementById('detailScore').textContent = productData.score;
+            document.getElementById('detailExplanation').textContent = productData.explanation;
+
+            // Set score color
+            const scoreClass = getScoreClass(productData.score);
+            document.getElementById('progressRing').className = `progress-ring progress-ring-fill ${scoreClass}`;
+            document.getElementById('detailProgressRing').className = `progress-ring progress-ring-fill ${scoreClass}`;
+
+            // Populate suggestions
+            const suggestionsList = document.getElementById('suggestionsList');
+            const detailSuggestions = document.getElementById('detailSuggestions');
+            
+            suggestionsList.innerHTML = '';
+            detailSuggestions.innerHTML = '';
+
+            productData.suggestions.forEach((suggestion, index) => {
+                const icon = getIconForSuggestion(suggestion);
+                
+                // Main suggestions list
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg';
+                suggestionItem.innerHTML = `
+                    <span class="text-xl">${icon}</span>
+                    <span class="text-gray-700 text-sm">${suggestion}</span>
+                `;
+                suggestionsList.appendChild(suggestionItem);
+
+                // Detail panel suggestions (top 2)
+                if (index < 2) {
+                    const detailItem = document.createElement('div');
+                    detailItem.className = 'flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-lg';
+                    detailItem.innerHTML = `
+                        <span class="text-lg">${icon}</span>
+                        <span class="text-gray-700 text-xs">${suggestion}</span>
+                    `;
+                    detailSuggestions.appendChild(detailItem);
+                }
+            });
+
+            // Populate flags
+            const flagsList = document.getElementById('flagsList');
+            flagsList.innerHTML = '';
+
+            productData.flags.forEach(flag => {
+                const severityClass = getSeverityClass(flag);
+                const flagItem = document.createElement('div');
+                flagItem.className = `inline-block px-3 py-2 rounded-full text-sm font-medium border ${severityClass} mr-2 mb-2`;
+                flagItem.textContent = flag;
+                flagsList.appendChild(flagItem);
+            });
+        }
+
+        function animateProgress() {
+            const percentage = productData.score;
+            const circumference = 2 * Math.PI * 50; // radius = 50
+            const detailCircumference = 2 * Math.PI * 30; // radius = 30
+            
+            setTimeout(() => {
+                const offset = circumference - (percentage / 100) * circumference;
+                const detailOffset = detailCircumference - (percentage / 100) * detailCircumference;
+                
+                document.getElementById('progressRing').style.strokeDashoffset = offset;
+                document.getElementById('detailProgressRing').style.strokeDashoffset = detailOffset;
+            }, 500);
+        }
+
+        function openModal() {
+            document.getElementById('modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            populateModal();
+            animateProgress();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            
+            // Hide detail panel if open
+            const detailPanel = document.getElementById('detailPanel');
+            if (!detailPanel.classList.contains('hidden')) {
+                detailPanel.classList.add('hidden');
+                document.getElementById('detailToggle').innerHTML = `
+                    <span>Show Details</span>
+                    <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                `;
+            }
+        }
+
+        function toggleDetailPanel() {
+            const detailPanel = document.getElementById('detailPanel');
+            const toggleButton = document.getElementById('detailToggle');
+            
+            if (detailPanel.classList.contains('hidden')) {
+                detailPanel.classList.remove('hidden');
+                toggleButton.innerHTML = `
+                    <span>Hide Details</span>
+                    <svg class="w-4 h-4 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                `;
+            } else {
+                detailPanel.classList.add('hidden');
+                toggleButton.innerHTML = `
+                    <span>Show Details</span>
+                    <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                `;
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

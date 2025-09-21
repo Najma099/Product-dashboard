@@ -12,14 +12,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
       {products.map((p) => (
         <ProductCard
           key={p.id}
-          productName={p.name}
-          category={p.category}
-          certification={p.certification}
-          transparencyScore={p.transparencyScore}
-          riskFlags={p.riskFlags}
-          status={p.status}
-          updatedDate={p.updatedDate}
-          scoreColor={p.transparencyScore > 85 ? "text-green-600" : p.transparencyScore > 70 ? "text-yellow-500" : "text-red-600"}
+          product={p}
         />
       ))}
     </div>
