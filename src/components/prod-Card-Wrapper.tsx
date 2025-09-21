@@ -1,20 +1,23 @@
-import {Card, CardContent, CardFooter, CardHeader} from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+
 interface ProductCardProps {
-    productName: string;
-    status?: string;
-    category?: string;
-    transparencyScore?: number;
-    riskFlags?: number;
-    updatedDate?: string;
-    scoreColor?: string;
-    showRiskIndicator?: boolean;
-    onClick?: () => void;
-};
+    productName: string
+    status?: string
+    category?: string
+    certification?: string
+    transparencyScore?: number
+    riskFlags?: number
+    updatedDate?: string
+    scoreColor?: string
+    showRiskIndicator?: boolean
+    onClick?: () => void
+}
 
 export const ProductCard = ({
     productName,
     status,
     category,
+    certification,
     transparencyScore,
     riskFlags,
     updatedDate,
@@ -32,6 +35,7 @@ export const ProductCard = ({
             </CardHeader>
             <CardContent>
                 {category && <p className="text-sm text-gray-600">{category}</p>}
+                {certification && <p className="text-sm text-gray-500 mt-1">Certification: {certification}</p>}
                 {transparencyScore !== undefined && (
                     <div className="mt-2">
                         <span className="text-sm">Transparency Score</span>
@@ -51,5 +55,5 @@ export const ProductCard = ({
                 )}
             </CardContent>
         </Card>
-    );
-};
+    )
+}

@@ -1,23 +1,39 @@
-import { Header } from '@/components/header';
-import { ProductCard } from '@/components/prod-Card-Wrapper'
-import {  SummaryCard } from '@/components/summary-Card'
+"use client"
+import { useState, useMemo } from "react"
+import { products as allProducts } from '@/data/product'
+import { FilterBar } from '@/components/filterbar'
+import { ProductGrid } from '@/components/product-Grid'
+import { SummaryCard } from '@/components/summary-Card'
+import { Header } from '@/components/header'
 
-export default function Home() {
+export default function Dashboard() {
+  const [search, setSearch] = useState("")
+  const [category, setCategory] = useState("")
+  const [certification, setCertification] = useState("")
+
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((p) => {
+      return (
+        (!search || p.name.toLowerCase().includes(search.toLowerCase())) &&
+        (!category || p.category === category) &&
+        (!certification || p.certification === certification)
+      )
+    })
+  }, [search, category, certification])
+
   return (
-    <div >
-      <Header/>
-      <main className='m-10'>
-        <SummaryCard/>
-        <ProductCard
-          productName="Organic Cotton T-Shirt"
-          status="active"
-          category="Apparel"
-          transparencyScore={87}
-          riskFlags={1}
-          updatedDate="15/01/2024"
-        />
-        
-      </main>
+    <div className="container mx-auto py-6">
+      < Header/>
+      <SummaryCard />
+      <FilterBar
+        search={search}
+        setSearch={setSearch}
+        category={category}
+        setCategory={setCategory}
+        certification={certification}
+        setCertification={setCertification}
+      />
+      <ProductGrid products={filteredProducts} />
     </div>
-  );
+  )
 }
